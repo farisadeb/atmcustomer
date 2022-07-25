@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,11 +92,18 @@ public class CustomerController {
 			custData = customerService.findById(id);
 			
 			Customer _customer = custData;
-			_customer.setSaldo(_customer.getSaldo().doubleValue() - customer.getSaldo().doubleValue());
-			_customer.setHistoryDt(LocalDateTime.now());
-			customerService.save(_customer);
+			if(_customer.getSaldo().doubleValue() >= customer.getSaldo().doubleValue())
+			{
+				_customer.setSaldo(_customer.getSaldo().doubleValue() - customer.getSaldo().doubleValue());
+				_customer.setHistoryDt(LocalDateTime.now());
+				customerService.save(_customer);
+				
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
 			
-			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
